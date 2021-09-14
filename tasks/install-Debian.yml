@@ -1,0 +1,22 @@
+---
+- name: Add Icinga Repository Key
+  apt_key:
+    url: https://packages.icinga.com/icinga.key
+    state: present
+  tags: ['install-icinga2-stack', 'install-icinga2']
+
+- name: Add Icinga APT Repository
+  apt_repository:
+    repo: deb http://packages.icinga.com/{{ ansible_distribution | lower }} icinga-{{ ansible_distribution_release }} main
+    state: present
+    filename: icinga
+  tags: ['install-icinga2-stack', 'install-icinga2']
+
+- name: Install Icinga Web 2
+  apt:
+    name:
+      - icingaweb2
+      - icingacli
+    state: present
+  when: icingaweb2_install == true
+  tags: ['install-icingaweb2']
