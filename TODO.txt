@@ -1,1 +1,5 @@
 - Restart PHP-FPM after install
+- Set icingaweb2_ssl_certificate_path, icingaweb2_ssl_certificate_key_path,
+  icingaweb2_https_enable, icingaweb2_https_force,
+  icingaweb2_access_log_path, icingaweb2_error_log_path,
+  icingaweb2_php_ini_file_path, icingaweb2_php_fpm_socket_path in defaults
