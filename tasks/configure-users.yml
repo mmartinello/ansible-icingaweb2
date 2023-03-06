@@ -1,0 +1,149 @@
+---
+- name: Generate the password hash for the Icingaweb2 admin user
+  ansible.builtin.shell:
+    "php -r \"echo password_hash(
+      '{{ icingaweb2_admin_password }}', PASSWORD_DEFAULT
+    );\""
+  register: icingaweb2_admin_password_hash
+  changed_when: icingaweb2_admin_password_hash.rc != 0
+
+- name: Check if admin user already exists
+  community.mysql.mysql_query:
+    query: SELECT
+      count(*) AS records_count
+      FROM icingaweb_user
+      WHERE name = %(name)s
+    named_args:
+      name: "{{ icingaweb2_admin_username }}"
+    login_db: "{{ icingaweb2_db_name }}"
+    login_host: "{{ icingaweb2_db_host }}"
+    login_port: "{{ icingaweb2_db_port | default(3306) }}"
+    login_user: "{{ icingaweb2_db_user }}"
+    login_password: "{{ icingaweb2_db_password }}"
+  register: icingaweb2_admin_user
+
+- name: Insert the Icingaweb2 admin user
+  community.mysql.mysql_query:
+    query: INSERT INTO
+      icingaweb_user (name, active, password_hash)
+      VALUES (%(name)s, 1, %(password)s)
+    named_args:
+      name: "{{ icingaweb2_admin_username }}"
+      password: "{{ icingaweb2_admin_password_hash.stdout }}"
+    login_db: "{{ icingaweb2_db_name }}"
+    login_host: "{{ icingaweb2_db_host }}"
+    login_port: "{{ icingaweb2_db_port | default(3306) }}"
+    login_user: "{{ icingaweb2_db_user }}"
+    login_password: "{{ icingaweb2_db_password }}"
+  when: >
+    icingaweb2_admin_password_hash.stdout != ""
+    and icingaweb2_admin_user.query_result[0][0].records_count == 0
+
+- name: Check if the password of the Icingaweb2 admin user needs to be changed
+  community.mysql.mysql_query:
+    query: SELECT
+      count(*) AS records_count
+      FROM icingaweb_user
+      WHERE name = %(icingaweb2_admin_username)s
+      AND password_hash = %(icingaweb2_admin_password_hash)s
+    named_args:
+      icingaweb2_admin_username: "{{ icingaweb2_admin_username }}"
+      icingaweb2_admin_password_hash: "{{ icingaweb2_admin_password_hash.stdout }}"
+    login_db: "{{ icingaweb2_db_name }}"
+    login_host: "{{ icingaweb2_db_host }}"
+    login_port: "{{ icingaweb2_db_port | default(3306) }}"
+    login_user: "{{ icingaweb2_db_user }}"
+    login_password: "{{ icingaweb2_db_password }}"
+  register: icingaweb2_admin_user_check_password
+  when: >
+    icingaweb2_admin_password_hash.stdout != ""
+    and icingaweb2_admin_user.query_result[0][0].records_count != 0
+
+- name: Change the password of the Icingaweb2 admin user
+  community.mysql.mysql_query:
+    query: UPDATE icingaweb_user
+      SET password_hash = %(password_hash)s
+      WHERE name = %(name)s
+    named_args:
+      password_hash: "{{ icingaweb2_admin_password_hash.stdout }}"
+      name: "{{ icingaweb2_admin_username }}"
+    login_db: "{{ icingaweb2_db_name }}"
+    login_host: "{{ icingaweb2_db_host }}"
+    login_port: "{{ icingaweb2_db_port | default(3306) }}"
+    login_user: "{{ icingaweb2_db_user }}"
+    login_password: "{{ icingaweb2_db_password }}"
+  when: >
+    icingaweb2_admin_password_hash.stdout != ""
+    and icingaweb2_admin_user.query_result[0][0].records_count != 0
+    and icingaweb2_admin_user_check_password.query_result[0][0].records_count == 0
+
+- name: Check if admin group already exists
+  community.mysql.mysql_query:
+    query: SELECT
+      count(*) AS records_count
+      FROM icingaweb_group
+      WHERE name = %(group_name)s
+    named_args:
+      group_name: Administrators
+    login_db: "{{ icingaweb2_db_name }}"
+    login_host: "{{ icingaweb2_db_host }}"
+    login_port: "{{ icingaweb2_db_port | default(3306) }}"
+    login_user: "{{ icingaweb2_db_user }}"
+    login_password: "{{ icingaweb2_db_password }}"
+  register: icingaweb2_admin_group
+
+- name: Insert the Icingaweb2 admin group
+  community.mysql.mysql_query:
+    query: INSERT INTO icingaweb_group (name)
+      VALUES (%(group_name)s)
+    named_args:
+      group_name: Administrators
+    login_db: "{{ icingaweb2_db_name }}"
+    login_host: "{{ icingaweb2_db_host }}"
+    login_port: "{{ icingaweb2_db_port | default(3306) }}"
+    login_user: "{{ icingaweb2_db_user }}"
+    login_password: "{{ icingaweb2_db_password }}"
+  when: icingaweb2_admin_group.query_result[0][0].records_count == 0
+
+- name: Get the admin group ID
+  community.mysql.mysql_query:
+    query: SELECT id FROM icingaweb_group WHERE name = %(group_name)s
+    named_args:
+      group_name: Administrators
+    login_db: "{{ icingaweb2_db_name }}"
+    login_host: "{{ icingaweb2_db_host }}"
+    login_port: "{{ icingaweb2_db_port | default(3306) }}"
+    login_user: "{{ icingaweb2_db_user }}"
+    login_password: "{{ icingaweb2_db_password }}"
+  register: icingaweb2_admin_group_id
+
+- name: Check if the admin username is already assigned to the admin group
+  community.mysql.mysql_query:
+    query: SELECT
+      count(*) AS records_count
+      FROM icingaweb_group_membership
+      WHERE group_id = %(group_id)s
+      AND username = %(username)s
+    named_args:
+      group_id: "{{ icingaweb2_admin_group_id.query_result[0][0].id }}"
+      username: "{{ icingaweb2_admin_username }}"
+    login_db: "{{ icingaweb2_db_name }}"
+    login_host: "{{ icingaweb2_db_host }}"
+    login_port: "{{ icingaweb2_db_port | default(3306) }}"
+    login_user: "{{ icingaweb2_db_user }}"
+    login_password: "{{ icingaweb2_db_password }}"
+  register: icingaweb2_admin_group_membership
+
+- name: Assign the Icingaweb2 admin user to the admin group
+  community.mysql.mysql_query:
+    query: INSERT INTO icingaweb_group_membership (group_id, username)
+      VALUES (%(group_id)s, %(username)s)
+    named_args:
+      group_id: "{{ (icingaweb2_admin_group_id.query_result | flatten | first).id }}"
+      username: "{{ icingaweb2_admin_username }}"
+    login_db: "{{ icingaweb2_db_name }}"
+    login_host: "{{ icingaweb2_db_host }}"
+    login_port: "{{ icingaweb2_db_port | default(3306) }}"
+    login_user: "{{ icingaweb2_db_user }}"
+    login_password: "{{ icingaweb2_db_password }}"
+  when: icingaweb2_admin_group_membership.query_result[0][0].records_count == 0

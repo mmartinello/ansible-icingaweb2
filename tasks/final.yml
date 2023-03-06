@@ -1,0 +1,5 @@
+---
+- name: Ensure that no setup token are configured
+  ansible.builtin.file:
+    path: /etc/icingaweb2/setup.token
+    state: absent

@@ -1,0 +1,42 @@
+---
+# Icingaweb2 configuration
+
+- name: Configure authentication configuration file
+  ansible.builtin.template:
+    src: authentication.ini.j2
+    dest: /etc/icingaweb2/authentication.ini
+    owner: www-data
+    group: icingaweb2
+    mode: '0660'
+
+- name: Configure main configuration file
+  ansible.builtin.template:
+    src: config.ini.j2
+    dest: /etc/icingaweb2/config.ini
+    owner: www-data
+    group: icingaweb2
+    mode: '0660'
+
+- name: Configure groups configuration file
+  ansible.builtin.template:
+    src: groups.ini.j2
+    dest: /etc/icingaweb2/groups.ini
+    owner: www-data
+    group: icingaweb2
+    mode: '0660'
+
+- name: Configure resources configuration file
+  ansible.builtin.template:
+    src: resources.ini.j2
+    dest: /etc/icingaweb2/resources.ini
+    owner: www-data
+    group: icingaweb2
+    mode: '0660'
+
+- name: Configure roles configuration file
+  ansible.builtin.template:
+    src: roles.ini.j2
+    dest: /etc/icingaweb2/roles.ini
+    owner: www-data
+    group: icingaweb2
+    mode: '0660'

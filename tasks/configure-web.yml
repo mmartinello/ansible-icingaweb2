@@ -1,0 +1,30 @@
+---
+- name: Manage SSL Self Signed Certificate
+  ansible.builtin.import_role:
+    name: mmartinello.ssl
+  vars:
+    self_signed_ssl_certs:
+      - common_name: "{{ icingaweb2_http_servername }}"
+        crt_path: "{{ icingaweb2_ssl_certificate_path }}"
+        key_path: "{{ icingaweb2_ssl_certificate_key_path }}"
+  when: icingaweb2_ssl_certificate_path and icingaweb2_ssl_certificate_key_path
+
+- name: Configure Nginx for Icinga Web 2
+  ansible.builtin.template:
+    src: nginx-icingaweb2.conf.j2
+    dest: "{{ icingaweb2_http_conf_file_path }}"
+    owner: root
+    group: root
+    mode: '0644'
+  when: icingaweb2_http_server|lower == 'nginx'
+  debugger: on_skipped
+  notify: Restart Nginx
+
+- name: Configure PHP for Icingaweb2
+  ansible.builtin.template:
+    src: icingaweb2-php.ini.j2
+    dest: "{{ icingaweb2_php_conf_dir_path }}/99-icingaweb2.ini"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: "Restart PHP-FPM"

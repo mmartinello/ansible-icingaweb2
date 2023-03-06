@@ -1,0 +1,49 @@
+---
+- name: Create the monitoring module configuration directory
+  ansible.builtin.file:
+    path: /etc/icingaweb2/modules/monitoring
+    state: directory
+    owner: www-data
+    group: icingaweb2
+    mode: '2755'
+
+- name: Configure backends configuration file
+  ansible.builtin.template:
+    src: monitoring/backends.ini.j2
+    dest: /etc/icingaweb2/modules/monitoring/backends.ini
+    owner: www-data
+    group: icingaweb2
+    mode: '0660'
+
+- name: Configure command transports configuration file
+  ansible.builtin.template:
+    src: monitoring/commandtransports.ini.j2
+    dest: /etc/icingaweb2/modules/monitoring/commandtransports.ini
+    owner: www-data
+    group: icingaweb2
+    mode: '0660'
+
+- name: Configure security configuration file
+  ansible.builtin.template:
+    src: monitoring/security.ini.j2
+    dest: /etc/icingaweb2/modules/monitoring/security.ini
+    owner: www-data
+    group: icingaweb2
+    mode: '0660'
+
+- name: Create the enabledModules directory
+  ansible.builtin.file:
+    path: /etc/icingaweb2/enabledModules
+    state: directory
+    owner: www-data
+    group: icingaweb2
+    mode: "2750"
+
+- name: Enable the monitoring module
+  ansible.builtin.file:
+    path: /etc/icingaweb2/enabledModules/monitoring
+    src: "{{ icingaweb2_monitoring_module_path }}"
+    state: link
+    owner: www-data
+    group: icingaweb2
+    mode: '0777'
