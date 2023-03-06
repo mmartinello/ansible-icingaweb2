@@ -1,2 +1,20 @@
 ---
-# handlers file for mmartinello.icingaweb2
+- name: Reload Nginx
+  ansible.builtin.service:
+    name: nginx
+    state: reloaded
+
+- name: Restart Nginx
+  ansible.builtin.service:
+    name: nginx
+    state: restarted
+
+- name: Reload PHP-FPM
+  ansible.builtin.service:
+    name: "{{ icingaweb2_php_fpm_service_name }}"
+    state: reloaded
+
+- name: Restart PHP-FPM
+  ansible.builtin.service:
+    name: "{{ icingaweb2_php_fpm_service_name }}"
+    state: restarted

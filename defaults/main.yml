@@ -6,21 +6,23 @@ icingaweb2_install: false
 icingaweb2_monitoring_module_path: /usr/share/icingaweb2/modules/monitoring
 
 # Icinga Web 2 HTTP Server
-icingaweb2_http_server: 'nginx'
-icingaweb2_http_conf_file_path: '/etc/nginx/conf.d/icingaweb2.conf'
+icingaweb2_http_server: nginx
+icingaweb2_http_conf_file_path: /etc/nginx/conf.d/icingaweb2.conf
 icingaweb2_http_enable: true
 icingaweb2_http_port: 80
 icingaweb2_http_servername: localhost
-icingaweb2_root_path: '/usr/share/icingaweb2/public'
-icingaweb2_access_log_path: '/var/log/nginx/icingaweb2.log'
-icingaweb2_error_log_path: '/var/log/nginx/icingaweb2-error.log'
+icingaweb2_root_path: /usr/share/icingaweb2/public
+icingaweb2_access_log_path: /var/log/nginx/icingaweb2.log
+icingaweb2_error_log_path: /var/log/nginx/icingaweb2-error.log
 icingaweb2_ssl_certificate_path: null
+icingaweb2_ssl_certificate_key_path: null
 icingaweb2_https_enable: false
 icingaweb2_https_force: true
 icingaweb2_https_port: 443
-icingaweb2_php_fpm_socket_path: '/run/php/php7.3-fpm.sock'
-icingaweb2_php_ini_file_path: '/etc/php/7.3/fpm/php.ini'
-icingaweb2_timezone: 'Europe/Rome'
+icingaweb2_php_fpm_service_name: php7.4-fpm
+icingaweb2_php_fpm_socket_path: /run/php/php7.4-fpm.sock
+icingaweb2_php_conf_dir_path: /etc/php/7.4/fpm/conf.d
+icingaweb2_timezone: 'Etc/UTC'
 
 # Icinga Web 2 Database
 icingaweb2_db_create: true
@@ -28,18 +30,23 @@ icingaweb2_db_purge: false
 icingaweb2_db_user_create: true
 icingaweb2_db_admin_user: null
 icingaweb2_db_admin_password: null
-icingaweb2_db_name: 'icingaweb2'
-icingaweb2_db_host: 'localhost'
+icingaweb2_db_name: icingaweb2
+icingaweb2_db_host: localhost
 icingaweb2_db_port: 3306
-icingaweb2_db_user: 'icingaweb2'
+icingaweb2_db_user: icingaweb2
 icingaweb2_db_password: "{{ ansible_machine_id ~ '_icingaweb2' | hash('sha1') | truncate(24, True, '') }}"
-icingaweb2_db_user_host: 'localhost'
-icingaweb2_db_user_privileges: 'ALL'
-icingaweb2_ido_db_user_host: 'localhost'
+icingaweb2_db_user_host: localhost
+icingaweb2_db_user_privileges: ALL
+icingaweb2_ido_db_user_host: localhost
 icingaweb2_ido_db_port: 3306
-icingaweb2_ido_db_name: 'icinga2'
+icingaweb2_ido_db_name: icinga2
 icingaweb2_ido_db_user_privileges: 'SELECT,INSERT,UPDATE,DELETE,CREATE,ALTER,DROP,CREATE VIEW,INDEX,EXECUTE'
-icingaweb2_db_schema_file_path: '/usr/share/icingaweb2/etc/schema/mysql.schema.sql'
+icingaweb2_db_schema_file_path: /usr/share/icingaweb2/schema/mysql.schema.sql
+
+# Icingaweb IDODB Database
+icingaweb2_ido_db_host: localhost
+icingaweb2_ido_db_user: icingaweb2
+icingaweb2_ido_db_password: "{{ ansible_machine_id ~ '_icinga2' | hash('sha1') | truncate(24, True, '') }}"
 
 # Icinga Web 2 Users:
 icingaweb2_admin_username: admin

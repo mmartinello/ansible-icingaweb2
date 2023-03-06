@@ -1,8 +1,15 @@
 ---
-- import_tasks: vars.yml
+- name: Setup variables
+  ansible.builtin.import_tasks: vars.yml
 
-- import_tasks: install.yml
+- name: Import installation tasks
+  ansible.builtin.import_tasks: install.yml
 
-- import_tasks: database.yml
+- name: Import database setup tasks
+  ansible.builtin.import_tasks: database.yml
 
-- import_tasks: configure.yml
+- name: Import configuration tasks
+  ansible.builtin.import_tasks: configure.yml
+
+- name: Import final tasks
+  ansible.builtin.import_tasks: final.yml

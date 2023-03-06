@@ -1,3 +1,4 @@
 ---
-- import_tasks: install-Debian.yml
+- name: Import installation tasks for Debian based OS
+  ansible.builtin.import_tasks: install-Debian.yml
   when: ansible_os_family in ["Debian", "Ubuntu"]
